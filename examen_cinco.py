@@ -212,3 +212,5 @@ def main():
         elif opcion =='6':
             break
 
+if __name__ == "__main__":
+    main()
