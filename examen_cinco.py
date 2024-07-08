@@ -1,7 +1,7 @@
 import csv
 from datetime import datetime
+import os
 
-#clase de gestion de empresas
 class Empresa:
     def __init__(self, id, nombre, descripcion, fecha_creacion, direccion, telefono, correo, gerente, equipo_contacto):
         self.id = id
@@ -212,5 +212,3 @@ def main():
         elif opcion =='6':
             break
 
-if __name__ == "__main__":
-    main()
