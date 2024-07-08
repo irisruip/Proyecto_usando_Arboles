@@ -160,6 +160,7 @@ def main():
     gestion_empresas.cargar_datos("empresa.csv")
     gestion_empresas.guardar_datos("empresa.csv")
     
+    
     #manejo el menu de opciones
     while True:
         menu()
@@ -193,7 +194,7 @@ def main():
             nuevos_miembros_equipo = input("Ingrese los nuevos nombres de los miembros del equipo (separados por comas): ").split(',')
             
             nueva_empresa = Empresa(id_empresa, nuevo_nombre, nueva_descripcion, nueva_fecha_creacion, nueva_direccion, nuevo_telefono, nuevo_correo, nuevo_gerente, nuevos_miembros_equipo)
-            empresa_principal.gestion_empresas.modificar_empresa(nueva_empresa)
+            gestion_empresas.modificar_empresa(nueva_empresa)
         
         
         elif opcion =='3':
@@ -208,9 +209,8 @@ def main():
             id_empresa = int(input("Ingrese el ID de la empresa que desea eliminar: "))
             empresa_principal.gestion_empresas.eliminar_empresa(id_empresa)
             
-
-
-
+        elif opcion =='6':
+            break
 
 if __name__ == "__main__":
     main()
