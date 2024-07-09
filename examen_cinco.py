@@ -299,7 +299,13 @@ def main():
             id_empresa = int(input("Ingrese el ID de la empresa: "))
             nombre = input("Ingrese el nombre de la empresa: ")
             descripcion = input("Ingrese la descripción de la empresa: ")
-            fecha_creacion = input("Ingrese la fecha de creación (YYYY-MM-DD): ")
+            while True:
+                try:
+                    fecha_creacion = input("Ingrese la nueva fecha de creación (YYYY-MM-DD): ")
+                    fecha_creacion = datetime.strptime(fecha_creacion, "%Y-%m-%d")
+                    break  
+                except ValueError:
+                    print("Formato de fecha no válido. Intente de nuevo.")
             direccion = input("Ingrese la dirección de la empresa: ")
             telefono = input("Ingrese el teléfono de la empresa: ")
             correo = input("Ingrese el correo electrónico de la empresa: ")
@@ -314,7 +320,12 @@ def main():
             id_empresa = int(input("Ingrese id de empresa a modificar: "))
             nuevo_nombre = input("Ingrese el nuevo nombre de la empresa : ") 
             nueva_descripcion = input("Ingrese la nueva descripción de la empresa : ") 
-            nueva_fecha_creacion = input("Ingrese la nueva fecha de creación (YYYY-MM-DD) : ")
+            try:
+                nueva_fecha_creacion = input("Ingrese la nueva fecha de creación (YYYY-MM-DD): ")
+                nueva_fecha_creacion = datetime.strptime(nueva_fecha_creacion, "%Y-%m-%d")
+                break  
+            except ValueError:
+                print("Formato de fecha no válido. Intente de nuevo.")
             nueva_direccion = input("Ingrese la nueva dirección de la empresa: ")
             nuevo_telefono = input("Ingrese el nuevo teléfono de la empresa: ")
             nuevo_correo = input("Ingrese el nuevo correo electrónico de la empresa: ")
