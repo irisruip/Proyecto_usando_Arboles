@@ -6,7 +6,7 @@ import json
 # Verificar el directorio de trabajo actual
 print("Directorio de trabajo actual:", os.getcwd())
 
-# Cambiar el directorio de trabajo si es necesario
+# Cambiar el directorio de trabajo si es necesarioo
 os.chdir('C:/Users/Irisbel/Desktop/algoritmos_V/Proyecto_usando_Arboles')
 print("Directorio de trabajo después de cambiar:", os.getcwd())
 
