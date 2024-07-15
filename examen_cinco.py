@@ -221,13 +221,47 @@ class Proyectos:
         self.equipo = equipo
         self.tareas = []
         
-    def add_task(self, tarea, parent_id=None):
+    def serialize(self):
+        def serialize_task(task):
+            return {
+                "id": task.id,
+                "nombre": task.nombre,
+                "descripcion": task.descripcion,
+                "fecha_inicio": str(task.fecha_inicio),  # Assuming fecha_inicio is a datetime object
+                "fecha_vencimiento": str(task.fecha_vencimiento),  # Assuming fecha_vencimiento is a datetime object
+                "estado_actual": task.estado_actual,
+                "subtareas": [serialize_task(subtask) for subtask in task.subtareas]
+            }
+        
+        return {
+            "id": self.id,
+            "nombre": self.nombre,
+            "descripcion": self.descripcion,
+            "fecha_inicio": str(self.fecha_inicio),
+            "fecha_vencimiento": str(self.fecha_vencimiento),
+            "estado_actual": self.estado_actual,
+            "empresa": self.empresa,
+            "gerente": self.gerente,
+            "equipo": self.equipo,
+            "tareas": [serialize_task(tarea) for tarea in self.tareas]
+        }
+    def save_to_json(self, filename="tareas.json"):
+        with open(filename, "w") as file:
+            json.dump(self.serialize(), file, indent=4)
+          
+    def add_task(self, tarea, parent_id=None, save=True):
         if parent_id is None:
             self.tareas.append(tarea)
         else:
             parent_task = self.find_task(parent_id)
             if parent_task:
-                parent_task.subtasks.append(tarea)
+                if not hasattr(parent_task, 'subtareas'):
+                    parent_task.subtareas = []
+                parent_task.subtareas.append(tarea)
+            else:
+                raise ValueError(f"Parent task with ID {parent_id} not found.")
+        if save:
+            self.save_to_json()
 
     def find_task(self, id, tareas=None):
         if tareas is None:
@@ -235,10 +269,11 @@ class Proyectos:
         for tarea in tareas:
             if tarea.id == id:
                 return tarea
-            subtask = self.find_task(id, tarea.subtareas)
-            if subtask:
-                return subtask
-        return None
+            if hasattr(tarea, 'subtareas'):
+                subtask = self.find_task(id, tarea.subtareas)
+                if subtask:
+                    return subtask
+            
     
     def delete_task(self, id):
         def _delete_task(tareas):
@@ -253,25 +288,26 @@ class Proyectos:
             print(f"{prefix}Task ID: {tarea.id}, Name: {tarea.name}, Level: {level}")
             self.list_tasks(level + 1, tarea.subtasks, prefix + "--")
 
-    def save_to_json(self, filename):
-        with open(filename, 'w') as file:
-            json.dump([self._task_to_dict(tarea) for tarea in self.tareas], file, indent=4, default=str)
 
     
     def load_from_json(self, filename):
         try:
             with open(filename, 'r') as file:
-                # Check if the file is not empty
                 file_content = file.read()
                 if not file_content:
                     raise ValueError("File is empty")
-                tasks_data = json.loads(file_content)  # Use json.loads to load from a string
+                tasks_data = json.loads(file_content)
+                if not isinstance(tasks_data, list) or not all(isinstance(task, dict) for task in tasks_data):
+                    raise ValueError("JSON file must contain an array of dictionaries")
                 self.tareas = [self._dict_to_task(task_data) for task_data in tasks_data]
-                
         except FileNotFoundError:
+            print("File not found. Initializing with an empty task list.")
             self.tareas = []
         except ValueError as e:
             print(f"Error loading JSON: {e}")
+            self.tareas = []
+        except json.JSONDecodeError as e:
+            print(f"Error decoding JSON: {e}")
             self.tareas = []
     
     def _task_to_dict(self, tarea):
@@ -288,11 +324,16 @@ class Proyectos:
         }
 
     def _dict_to_task(self, data):
-        tarea = Tareas(data['id'], data['name'], data['customer_company'], data['description'],
-                    datetime.fromisoformat(data['start_date']), datetime.fromisoformat(data['due_date']),
-                    data['current_status'], data['percentage'])
+        print("Data received:", data)
+        if not isinstance(data, dict):
+            raise TypeError("Expected data to be a dictionary, got {}".format(type(data)))
+        tarea = Tareas(
+            data['id'], data['name'], data['customer_company'], data['description'],
+            datetime.fromisoformat(data['start_date']), datetime.fromisoformat(data['due_date']),
+            data['current_status'], data['percentage']
+            )
         tarea.subtareas = [self._dict_to_task(subtask_data) for subtask_data in data.get('subtareas', [])]
-        return tarea      
+        return tarea     
                
 class AVLNode:
     def __init__(self, proyecto):
@@ -672,6 +713,7 @@ def main():
         elif opcion == '13':
             id = input("Task ID: ")
             name = input("Task Name: ")
+            company = input("Company Name: ")
             customer_company = input("Customer Company: ")
             description = input("Description: ")
             start_date = input("Start Date (YYYY-MM-DD): ")
@@ -681,7 +723,7 @@ def main():
             parent_id = input("Parent Task ID (leave blank if none): ")
             parent_id = None if parent_id == '' else parent_id
 
-            tarea = Tareas(id, name, customer_company, description, datetime.strptime(start_date, "%Y-%m-%d"), datetime.strptime(due_date, "%Y-%m-%d"), current_status, porcentaje = percentage)
+            tarea = Tareas(id, nombre=name, empresa=company,cliente =customer_company, descripcion = description, fecha_inicio=datetime.strptime(start_date, "%Y-%m-%d"), fecha_vencimiento=datetime.strptime(due_date, "%Y-%m-%d"), estado_actual=current_status, porcentaje = percentage)
             proyecto_principal.add_task(tarea, parent_id)
             print("Task added successfully.")
             
