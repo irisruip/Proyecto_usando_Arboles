@@ -262,7 +262,7 @@ class Proyectos:
                 raise ValueError(f"Parent task with ID {parent_id} not found.")
         if save:
             self.save_to_json()
-
+            
     def find_task(self, id, tareas=None):
         if tareas is None:
             tareas = self.tareas
@@ -724,10 +724,24 @@ def main():
             parent_id = None if parent_id == '' else parent_id
 
             tarea = Tareas(id, nombre=name, empresa=company,cliente =customer_company, descripcion = description, fecha_inicio=datetime.strptime(start_date, "%Y-%m-%d"), fecha_vencimiento=datetime.strptime(due_date, "%Y-%m-%d"), estado_actual=current_status, porcentaje = percentage)
-            proyecto_principal.add_task(tarea, parent_id)
+            proyecto_principal.add_task(tarea)
             print("Task added successfully.")
             
-             
+        elif opcion == '14':
+            parent_id = input("Parent Task ID: ")
+            id = input("Subtask ID: ")
+            name = input("Subtask Name: ")
+            company = input("Company Name: ")
+            customer_company = input("Customer Company: ")
+            description = input("Description: ")
+            start_date = input("Start Date (YYYY-MM-DD): ")
+            due_date = input("Due Date (YYYY-MM-DD): ")
+            current_status = input("Current Status: ")
+            percentage = float(input("Percentage Complete: "))
+            
+            subtask = Tareas(id, nombre=name, empresa=company, cliente=customer_company, descripcion=description, fecha_inicio=datetime.strptime(start_date, "%Y-%m-%d"), fecha_vencimiento=datetime.strptime(due_date, "%Y-%m-%d"), estado_actual=current_status, porcentaje=percentage)
+            proyecto_principal.add_task(subtask, parent_id)
+            print("Subtask added successfully.")    
         
 
 if __name__ == "__main__":
