@@ -2,29 +2,20 @@
     "id": 0,
     "nombre": "nombre",
     "descripcion": "descripcion",
-    "fecha_inicio": "2024-07-15 17:07:58.544095",
-    "fecha_vencimiento": "2024-07-15 17:07:58.544095",
+    "fecha_inicio": "2024-07-15 17:51:03.899663",
+    "fecha_vencimiento": "2024-07-15 17:51:03.899663",
     "estado_actual": "estado_actual",
     "empresa": "empresa",
     "gerente": "gerente",
     "equipo": "equipo",
     "tareas": [
         {
-            "id": "777",
-            "nombre": "dsf",
-            "descripcion": "dsfsdf",
-            "fecha_inicio": "2008-02-03 00:00:00",
-            "fecha_vencimiento": "2007-03-04 00:00:00",
-            "estado_actual": "dsdsd",
-            "subtareas": []
-        },
-        {
-            "id": "555",
-            "nombre": "sdds",
-            "descripcion": "dsdsa",
-            "fecha_inicio": "2006-02-02 00:00:00",
-            "fecha_vencimiento": "2008-03-03 00:00:00",
-            "estado_actual": "sdsds",
+            "id": "123",
+            "nombre": "sdsds",
+            "descripcion": "adsdsdsa",
+            "fecha_inicio": "2005-12-02 00:00:00",
+            "fecha_vencimiento": "2006-12-03 00:00:00",
+            "estado_actual": "sdsd",
             "subtareas": []
         }
     ]

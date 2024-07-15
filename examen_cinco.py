@@ -262,7 +262,16 @@ class Proyectos:
                 raise ValueError(f"Parent task with ID {parent_id} not found.")
         if save:
             self.save_to_json()
-            
+          
+    def update_task(self, updated_task):
+        for index, tarea in enumerate(self.tareas):
+            if tarea.id == updated_task.id:
+                self.tareas[index] = updated_task
+                self.save_to_json()
+                return True
+        return False
+        
+      
     def find_task(self, id, tareas=None):
         if tareas is None:
             tareas = self.tareas
@@ -743,6 +752,52 @@ def main():
             proyecto_principal.add_task(subtask, parent_id)
             print("Subtask added successfully.")    
         
+        elif opcion == '15':
+            id = input("Task ID to modify: ")
+            tarea = proyecto_principal.find_task(id)
+            if tarea:
+                print("Leave blank to keep current value.")
+                name = input(f"Task Name [{tarea.nombre}]: ") or tarea.nombre
+                company = input(f"Company Name [{tarea.empresa}]: ") or tarea.empresa
+                customer_company = input(f"Customer Company [{tarea.cliente}]: ") or tarea.cliente
+                description = input(f"Description [{tarea.descripcion}]: ") or tarea.descripcion
+                start_date = input(f"Start Date (YYYY-MM-DD) [{tarea.fecha_inicio.strftime('%Y-%m-%d')}]: ") or tarea.fecha_inicio.strftime('%Y-%m-%d')
+                due_date = input(f"Due Date (YYYY-MM-DD) [{tarea.fecha_vencimiento.strftime('%Y-%m-%d')}]: ") or tarea.fecha_vencimiento.strftime('%Y-%m-%d')
+                current_status = input(f"Current Status [{tarea.estado_actual}]: ") or tarea.estado_actual
+                percentage_str = input(f"Percentage Complete [{tarea.porcentaje}]: ")
+                percentage = float(percentage_str) if percentage_str else tarea.porcentaje
+                
+                tarea.nombre = name
+                tarea.empresa = company
+                tarea.cliente = customer_company
+                tarea.descripcion = description
+                tarea.fecha_inicio = datetime.strptime(start_date, "%Y-%m-%d")
+                tarea.fecha_vencimiento = datetime.strptime(due_date, "%Y-%m-%d")
+                tarea.estado_actual = current_status
+                tarea.porcentaje = percentage
+                
+                if proyecto_principal.update_task(tarea):
+                    print("Task updated successfully.")
+                else:
+                    print("Failed to update the task.")
+            else:
+                print("Task not found.")
+        
+        elif opcion == '16':
+            id = input("Task ID to view: ")
+            tarea = proyecto_principal.find_task(id)
+            if tarea:
+                print(f"Task ID: {tarea.id}")
+                print(f"Task Name: {tarea.nombre}")
+                print(f"Company Name: {tarea.empresa}")
+                print(f"Customer Company: {tarea.cliente}")
+                print(f"Description: {tarea.descripcion}")
+                print(f"Start Date: {tarea.fecha_inicio.strftime('%Y-%m-%d')}")
+                print(f"Due Date: {tarea.fecha_vencimiento.strftime('%Y-%m-%d')}")
+                print(f"Current Status: {tarea.estado_actual}")
+                print(f"Percentage Complete: {tarea.porcentaje}%")
+            else:
+                print("Task not found.")
 
 if __name__ == "__main__":
     main()
