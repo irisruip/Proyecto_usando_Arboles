@@ -3,12 +3,15 @@ from datetime import datetime
 import os
 import json
 
+
 # Verificar el directorio de trabajo actual
 print("Directorio de trabajo actual:", os.getcwd())
 
-# Cambiar el directorio de trabajo si es necesarioo
+
+# Cambiar el directorio de trabajo si es necesario
 os.chdir('C:/Users/Irisbel/Desktop/algoritmos_V/Proyecto_usando_Arboles')
 print("Directorio de trabajo después de cambiar:", os.getcwd())
+
 
 class Empresa:
     def __init__(self, id, nombre, descripcion, fecha_creacion, direccion, telefono, correo, gerente, equipo_contacto):
@@ -22,6 +25,8 @@ class Empresa:
         self.gerente = gerente
         self.equipo_contacto = equipo_contacto
         self.proyectos = []
+        
+        
         
 #nodo para lista enlazada
 class NodoEmpresa:
@@ -54,6 +59,7 @@ class Gestion:
                 self.agregar_empresa(empresa)
     
     
+    
     #guardo datos en el archivo csv         
     def guardar_datos(self, archivo_csv):
         with open(archivo_csv, 'w', newline='') as archivo:
@@ -73,6 +79,7 @@ class Gestion:
                     'equipo_contacto': ','.join(nodo_actual.empresa.equipo_contacto)
                     })
                 nodo_actual = nodo_actual.siguiente
+                
                 
     #agrego la empresa a la lista
     def agregar_empresa(self, empresa):
@@ -100,6 +107,8 @@ class Gestion:
                 'gerente': empresa.gerente,
                 'equipo_contacto': ','.join(empresa.equipo_contacto)})
          
+         
+         
     #busco la empresa por su id en la lista   
     def buscar_empresa_por_id(self, id_empresa):
         nodo_actual = self.cabeza
@@ -108,6 +117,8 @@ class Gestion:
                 return nodo_actual.empresa
             nodo_actual = nodo_actual.siguiente
         return None
+    
+    
     
     #modifico segun el id
     def modificar_empresa(self, id_empresa, nuevo_nombre, nueva_descripcion, nueva_fecha_creacion, nueva_direccion, nuevo_telefono, nuevo_correo, nuevo_gerente, nuevos_miembros_equipo):
@@ -125,7 +136,7 @@ class Gestion:
         empresa_a_modificar.gerente = nuevo_gerente
         empresa_a_modificar.equipo_contacto = nuevos_miembros_equipo
         
-        # Actualizar el registro correspondiente en el archivo "algo.csv"
+        # Actualizar el registro correspondiente en el archivo "companie.csv"
         with open('companie.csv', 'r') as archivo_lectura:
             lector = csv.DictReader(archivo_lectura)
             lineas = list(lector)
@@ -146,6 +157,8 @@ class Gestion:
                     linea['equipo_contacto'] = ','.join(nuevos_miembros_equipo)
                 escritor.writerow(linea)
         
+        
+        
     #consulto segun el id
     def consultar(self, id_empresa):
         nodo_actual = self.cabeza
@@ -163,6 +176,8 @@ class Gestion:
                 return nodo_actual.empresa
             nodo_actual = nodo_actual.siguiente
         return None
+        
+        
         
     #lista de todas las empresas con id y nombre   
     def listar_empresas(self):
@@ -208,7 +223,7 @@ class Gestion:
             nodo_anterior = nodo_actual
             nodo_actual = nodo_actual.siguiente
             
-#tareas para aarbol n-ario
+#tareas para arbol n-ario
 class Tareas:
     def __init__(self, id, nombre, empresa,  cliente, descripcion, fecha_inicio, fecha_vencimiento, estado_actual, porcentaje):
         self.id = id
@@ -221,6 +236,7 @@ class Tareas:
         self.estado_actual = estado_actual
         self.porcentaje = porcentaje
         self.subtareas = []
+        
         
 class Proyectos:
     def __init__(self, id, nombre, descripcion, fecha_inicio, fecha_vencimiento, estado_actual, empresa, gerente, equipo):
@@ -241,8 +257,8 @@ class Proyectos:
                 "id": task.id,
                 "nombre": task.nombre,
                 "descripcion": task.descripcion,
-                "fecha_inicio": str(task.fecha_inicio),  # Assuming fecha_inicio is a datetime object
-                "fecha_vencimiento": str(task.fecha_vencimiento),  # Assuming fecha_vencimiento is a datetime object
+                "fecha_inicio": str(task.fecha_inicio), 
+                "fecha_vencimiento": str(task.fecha_vencimiento),  
                 "estado_actual": task.estado_actual,
                 "subtareas": [serialize_task(subtask) for subtask in task.subtareas]
             }
@@ -259,10 +275,13 @@ class Proyectos:
             "equipo": self.equipo,
             "tareas": [serialize_task(tarea) for tarea in self.tareas]
         }
+        
+    #mostrar en el json  
     def save_to_json(self, filename="tareas.json"):
         with open(filename, "w") as file:
             json.dump(self.serialize(), file, indent=4)
-          
+     
+     #agregar tarea     
     def add_task(self, tarea, parent_id=None, save=True):
         if parent_id is None:
             self.tareas.append(tarea)
@@ -276,7 +295,8 @@ class Proyectos:
                 raise ValueError(f"Parent task with ID {parent_id} not found.")
         if save:
             self.save_to_json()
-          
+     
+     #actualizar tarea en el json     
     def update_task(self, updated_task):
         for index, tarea in enumerate(self.tareas):
             if tarea.id == updated_task.id:
@@ -285,7 +305,7 @@ class Proyectos:
                 return True
         return False
         
-      
+     #encontrar tarea por id 
     def find_task(self, id, tareas=None):
         if tareas is None:
             tareas = self.tareas
@@ -297,15 +317,16 @@ class Proyectos:
                 if subtask:
                     return subtask
             
-    
+    #eliminar tarea
     def delete_task(self, id_tarea):
         for index, tarea in enumerate(self.tareas):
             if tarea.id == id_tarea:
                 del self.tareas[index]
-                self.save_to_json()  # Asumiendo que tienes una función para guardar los cambios
+                self.save_to_json()  
                 return True
         return False
-
+    
+    #listar tareas
     def list_tasks(self, level=0, tareas=None, prefix=""):
         if tareas is None:
             tareas = self.tareas
@@ -314,7 +335,7 @@ class Proyectos:
             self.list_tasks(level + 1, tarea.subtasks, prefix + "--")
 
 
-    
+    #leer el json
     def load_from_json(self, filename):
         try:
             with open(filename, 'r') as file:
@@ -359,7 +380,8 @@ class Proyectos:
             )
         tarea.subtareas = [self._dict_to_task(subtask_data) for subtask_data in data.get('subtareas', [])]
         return tarea     
-               
+
+#inicializo altura, izquierda y derecha              
 class AVLNode:
     def __init__(self, proyecto):
         self.proyecto = proyecto
@@ -367,6 +389,7 @@ class AVLNode:
         self.izquierda = None
         self.derecha = None
 
+#comienzo a trabajar con el arbol avl
 class AVLTree:
     def insert(self, root, proyecto):
         if not root:
@@ -392,6 +415,7 @@ class AVLTree:
 
         return root
 
+    #izquierda
     def leftRotate(self, z):
         y = z.derecha
         T2 = y.izquierda
@@ -401,6 +425,7 @@ class AVLTree:
         y.altura = 1 + max(self.getHeight(y.izquierda), self.getHeight(y.derecha))
         return y
     
+    #derecha
     def rightRotate(self, y):
         x = y.izquierda
         T2 = x.derecha
@@ -409,17 +434,20 @@ class AVLTree:
         y.altura = 1 + max(self.getHeight(y.izquierda), self.getHeight(y.derecha))
         x.altura = 1 + max(self.getHeight(x.izquierda), self.getHeight(x.derecha))
         return x
-
+    
+    #obtengo altura
     def getHeight(self, root):
         if not root:
             return 0
         return root.altura
-
+    
+    #obtengo balance
     def getBalance(self, root):
         if not root:
             return 0
         return self.getHeight(root.izquierda) - self.getHeight(root.derecha)
-
+    
+    #trabajo en preorden
     def preOrder(self, root):
         if not root:
             return
@@ -427,6 +455,7 @@ class AVLTree:
         self.preOrder(root.izquierda)
         self.preOrder(root.derecha)
         
+    #metodo para buscar   
     def search(self, root, key):
         if root is None or root.proyecto.id == key:
             return root
@@ -434,7 +463,7 @@ class AVLTree:
             return self.search(root.derecha, key)
         return self.search(root.izquierda, key)
     
-    
+    #obtengo los proyectos
     def collectProjects(self, root, projects_list):
         if root:
             self.collectProjects(root.izquierda, projects_list)
@@ -450,11 +479,12 @@ class AVLTree:
         for project in projects_list:
             print(f"{project.nombre} - Vencimiento: {project.fecha_vencimiento.strftime('%Y-%m-%d')}")
     
+    #elimino
     def delete(self, root, project_id):
         if not root:
             return root
 
-        # Step 1: Perform standard BST delete
+
         if project_id < root.proyecto.id:
             root.izquierda = self.delete(root.izquierda, project_id)
         elif project_id > root.proyecto.id:
@@ -472,31 +502,30 @@ class AVLTree:
             root.proyecto = temp.proyecto
             root.derecha = self.delete(root.derecha, temp.proyecto.id)
 
-        # If the tree had only one node then return
+
         if root is None:
             return root
         
-         # Step 2: Update the height of the current node
+
         root.altura = 1 + max(self.getHeight(root.izquierda), self.getHeight(root.derecha))
 
-        # Step 3: Get the balance factor
+   
         balance = self.getBalance(root)
 
-        # Step 4: If the node is unbalanced, then try out the 4 cases
-        # Case 1 - Left Left
+
         if balance > 1 and self.getBalance(root.izquierda) >= 0:
             return self.rightRotate(root)
 
-        # Case 2 - Right Right
+
         if balance < -1 and self.getBalance(root.derecha) <= 0:
             return self.leftRotate(root)
 
-        # Case 3 - Left Right
+     
         if balance > 1 and self.getBalance(root.izquierda) < 0:
             root.izquierda = self.leftRotate(root.izquierda)
             return self.rightRotate(root)
 
-        # Case 4 - Right Left
+    
         if balance < -1 and self.getBalance(root.derecha) > 0:
             root.derecha = self.rightRotate(root.derecha)
             return self.leftRotate(root)
@@ -508,9 +537,98 @@ class AVLTree:
             return node
         return self.getMinValueNode(node.izquierda) 
 
-        
-        
-                               
+"""        
+class Sprint:
+    def __init__(self, id, nombre, fecha_inicio, fecha_fin, estado, objetivos, equipo, tareas=None):
+        self.id = id
+        self.nombre = nombre
+        self.fecha_inicio = fecha_inicio
+        self.fecha_fin = fecha_fin
+        self.estado = estado
+        self.objetivos = objetivos
+        self.equipo = equipo
+        self.tareas = tareas if tareas is not None else []
+
+    def __str__(self):
+        return (f"ID: {self.id}, Nombre: {self.nombre}, Fecha de Inicio: {self.fecha_inicio}, "
+                f"Fecha de Fin: {self.fecha_fin}, Estado: {self.estado}, Objetivos: {self.objetivos}, "
+                f"Equipo: {self.equipo}, Tareas: {self.tareas}")     
+         
+def cargar_sprints(archivo_json):
+    with open(archivo_json, 'r') as file:
+        sprints = json.load(file)
+    return sprints
+
+def guardar_sprints(sprints, archivo_json):
+    with open(archivo_json, 'w') as file:
+        json.dump(sprints, file, indent=4)
+
+def agregar_sprint(sprints):
+    sprint_id = input("ID del Sprint: ")
+    nombre = input("Nombre: ")
+    fecha_inicio = input("Fecha de Inicio: ")
+    fecha_fin = input("Fecha de Fin: ")
+    estado = input("Estado: ")
+    objetivos = input("Objetivos: ")
+    equipo = input("Equipo: ")
+    nuevo_sprint = {
+        "id": sprint_id,
+        "nombre": nombre,
+        "fecha_inicio": fecha_inicio,
+        "fecha_fin": fecha_fin,
+        "estado": estado,
+        "objetivos": objetivos,
+        "equipo": equipo,
+        "tareas": []
+    }
+    sprints[sprint_id] = nuevo_sprint
+    guardar_sprints(sprints, 'sprints.json')
+
+def listar_sprints(sprints):
+    for sprint_id, sprint in sprints.items():
+        print(sprint)
+
+def tareas_criticas(tareas, proyecto_id):
+    if proyecto_id in tareas:
+        print("Tareas críticas en postorden:")
+        for tarea in postorden_tareas(tareas[proyecto_id]):
+            if tarea["estado_actual"] != "Completado":
+                print(tarea)
+    else:
+        print("No hay tareas para este proyecto.")
+
+def postorden_tareas(tareas):
+    res = []
+    for tarea in tareas:
+        res.extend(postorden_tareas(tarea["subtareas"]))
+        res.append(tarea)
+    return res
+
+def listar_sprints_nivel(avl_tree, nivel):
+    sprints = listar_sprints_nivel_aux(avl_tree, nivel, 0)
+    for sprint in sprints:
+        print(sprint)
+
+def listar_sprints_nivel_aux(root, nivel, actual):
+    if root is None:
+        return []
+    if actual == nivel:
+        return [root.sprint]
+    return (listar_sprints_nivel_aux(root.left, nivel, actual + 1) +
+            listar_sprints_nivel_aux(root.right, nivel, actual + 1))
+
+def mostrar_tareas_preorden(tareas):
+    if isinstance(tareas, dict):
+        for tarea in preorden_tareas(tareas):
+            print(tarea)
+
+def preorden_tareas(tareas):
+    res = []
+    for tarea in tareas:
+        res.append(tarea)
+        res.extend(preorden_tareas(tarea["subtareas"]))
+    return res
+"""                                                        
 class subTareas:
     def __init__(self, id, nombre, empresa,  cliente, descripcion, fecha_inicio, fecha_vencimiento, estado_actual, porcentaje):
         self.id = id
@@ -546,21 +664,18 @@ def menu():
     
     print("-----MODULO DE GESTION DE TAREAS Y PRIORIDADES----")
     print("11. Crear tarea")
-    print("12. Agregar subtarea")
-    print("13. Modificar tarea")
-    print("14. Consultar tarea")
-    print("15. Listar tarea")
-    print("16. Eliminar tarea y subtareas de la tarea")
+    print("12. Modificar tarea")
+    print("13. Consultar tarea")
+    print("14. Listar tarea")
+    print("15. Eliminar tarea y subtareas de la tarea")
     print("\n")
     
     print("-----MODULO DE GESTION DE SPRINTS----")
-    print("17. Crear sprint")
-    print("18. Editar sprint")
-    print("19. Listar sprints")
-    print("20. Eliminar sprint")
-    print("21. Agregar una tarea a un sprint")
-    print("22. Editar una tarea de un sprint")
-    print("23. Eliminar una tarea de un sprint")
+    print("16. Crear sprint")
+    print("17. Editar sprint")
+    print("18. Listar sprints")
+    print("19. Eliminar sprint")
+
     
 def main():
     empresa_principal = Empresa(
@@ -594,6 +709,7 @@ def main():
     root = None
     
     proyecto_principal.load_from_json('tareas.json')
+    
     
     #manejo el menu de opciones
     while True:
@@ -694,12 +810,41 @@ def main():
         
         elif opcion == '7':
             project_id = input("Ingrese el ID del proyecto: ")
-            project_node = projects_avl_tree.search(root, project_id)  # Assuming a search method exists
+            project_node = projects_avl_tree.search(root, project_id)  
             if project_node:
-                new_name = input("Enter new project name (leave blank to keep current): ")
+                print("Deje en blanco los campos que no quiera cambiar")
+                new_name = input("Ingrese el nuevo nombre: ")
                 if new_name:
                     proyecto.nombre = new_name            
-                print("Proyecto actualizado satisactoriamente.")
+ 
+                new_descripcion = input("Ingrese la nueva descripcion: ")
+                if new_descripcion:
+                    proyecto.descripcion = new_descripcion
+                    
+                new_fecha_inicio= input("Ingrese la nueva fecha (YYYY-MM-DD): ")
+                if new_fecha_inicio:
+                    proyecto.fecha_inicio = new_fecha_inicio
+                    
+                new_fecha_vencimiento= input("Ingrese la nueva fecha (YYYY-MM-DD): ")
+                if new_fecha_vencimiento:
+                    proyecto.fecha_inicio = new_fecha_vencimiento
+                    
+                new_estado_actual= input("Ingrese el nuevo estado: ")
+                if new_estado_actual:
+                    proyecto.estado_actual = new_estado_actual
+                    
+                new_empresa= input("Ingrese la nueva empresa: ")
+                if new_empresa:
+                    proyecto.empresa = new_empresa
+                    
+                new_gerente= input("Ingrese el nuevo gerente: ")
+                if new_empresa:
+                    proyecto.gerente = new_gerente
+                    
+                new_equipo= input("Ingrese el nuevo equipo: ")
+                if new_equipo:
+                    proyecto.equipo = new_equipo
+                print("Proyecto actualizado satisfactoriamente")       
             else:
                 print("Proyecto no encontrado.")
         
@@ -732,63 +877,48 @@ def main():
             print("Proyecto eliminado satisfactoriamente")
             
         elif opcion == '11':
-            id = input("Task ID: ")
-            name = input("Task Name: ")
-            company = input("Company Name: ")
-            customer_company = input("Customer Company: ")
-            description = input("Description: ")
+            id = input("Tarea ID: ")
+            name = input("Tarea nombre: ")
+            company = input("Nombre de la empresa: ")
+            customer_company = input("Cliente: ")
+            description = input("Descripcion: ")
             while True:
                 try: 
-                    start_date = input("Start Date (YYYY-MM-DD): ")
+                    start_date = input("Fecha de inicio (YYYY-MM-DD): ")
                     start_date = datetime.strptime(start_date, "%Y-%m-%d")
                     break
                 except ValueError:
                     print("Formato de fecha no válido. Intente de nuevo.")
             while True:
                 try:
-                    due_date = input("Due Date (YYYY-MM-DD): ")
+                    due_date = input("Fecha de vencimiento(YYYY-MM-DD): ")
                     due_date = datetime.strptime(due_date, "%Y-%m-%d")
                     break
                 except ValueError:
                     print("Formato de fecha no válido. Intente de nuevo")
-            current_status = input("Current Status: ")
-            percentage = float(input("Percentage Complete: "))
-            parent_id = input("Parent Task ID (leave blank if none): ")
+            current_status = input("Estado actual: ")
+            percentage = float(input("Porcentaje completado: "))
+            parent_id = input("Parent Task ID (dejar en blanco si no hay parent task): ")
             parent_id = None if parent_id == '' else parent_id
 
             tarea = Tareas(id, nombre=name, empresa=company,cliente =customer_company, descripcion = description, fecha_inicio=start_date, fecha_vencimiento=due_date, estado_actual=current_status, porcentaje = percentage)
             proyecto_principal.add_task(tarea)
             print("Task added successfully.")
-            
-        elif opcion == '12':
-            parent_id = input("Parent Task ID: ")
-            id = input("Subtask ID: ")
-            name = input("Subtask Name: ")
-            company = input("Company Name: ")
-            customer_company = input("Customer Company: ")
-            description = input("Description: ")
-            start_date = input("Start Date (YYYY-MM-DD): ")
-            due_date = input("Due Date (YYYY-MM-DD): ")
-            current_status = input("Current Status: ")
-            percentage = float(input("Percentage Complete: "))
-            
-            subtask = Tareas(id, nombre=name, empresa=company, cliente=customer_company, descripcion=description, fecha_inicio=datetime.strptime(start_date, "%Y-%m-%d"), fecha_vencimiento=datetime.strptime(due_date, "%Y-%m-%d"), estado_actual=current_status, porcentaje=percentage)
-            proyecto_principal.add_task(subtask, parent_id)
-            print("Subtask added successfully.")    
+              
         
-        elif opcion == '13':
-            id = input("Task ID to modify: ")
+        elif opcion == '12':
+            id = input("ID de la tarea a modificar: ")
             tarea = proyecto_principal.find_task(id)
             if tarea:
-                print("Leave blank to keep current value.")
-                name = input(f"Task Name [{tarea.nombre}]: ") or tarea.nombre
-                company = input(f"Company Name [{tarea.empresa}]: ") or tarea.empresa
-                customer_company = input(f"Customer Company [{tarea.cliente}]: ") or tarea.cliente
-                description = input(f"Description [{tarea.descripcion}]: ") or tarea.descripcion
-                start_date = input(f"Start Date (YYYY-MM-DD) [{tarea.fecha_inicio.strftime('%Y-%m-%d')}]: ") or tarea.fecha_inicio.strftime('%Y-%m-%d')
-                due_date = input(f"Due Date (YYYY-MM-DD) [{tarea.fecha_vencimiento.strftime('%Y-%m-%d')}]: ") or tarea.fecha_vencimiento.strftime('%Y-%m-%d')
-                current_status = input(f"Current Status [{tarea.estado_actual}]: ") or tarea.estado_actual
-                percentage_str = input(f"Percentage Complete [{tarea.porcentaje}]: ")
+                print("Deje en blanco si no desea cambiar nada")
+                name = input(f"Nuevo nombre [{tarea.nombre}]: ") or tarea.nombre
+                company = input(f"Nueva empresa[{tarea.empresa}]: ") or tarea.empresa
+                customer_company = input(f"Nuevo cliente[{tarea.cliente}]: ") or tarea.cliente
+                description = input(f"Nueva descripcion [{tarea.descripcion}]: ") or tarea.descripcion
+                start_date = input(f"Nueva fecha de inicio (YYYY-MM-DD) [{tarea.fecha_inicio.strftime('%Y-%m-%d')}]: ") or tarea.fecha_inicio.strftime('%Y-%m-%d')
+                due_date = input(f"Nueva fecha de vencimiento (YYYY-MM-DD) [{tarea.fecha_vencimiento.strftime('%Y-%m-%d')}]: ") or tarea.fecha_vencimiento.strftime('%Y-%m-%d')
+                current_status = input(f"Nuevo estado actual [{tarea.estado_actual}]: ") or tarea.estado_actual
+                percentage_str = input(f"Nuevo porcentaje completado [{tarea.porcentaje}]: ")
                 percentage = float(percentage_str) if percentage_str else tarea.porcentaje
                 
                 tarea.nombre = name
@@ -807,48 +937,46 @@ def main():
             else:
                 print("Task not found.")
         
-        elif opcion == '14':
+        elif opcion == '13':
             id = input("Task ID to view: ")
             tarea = proyecto_principal.find_task(id)
             if tarea:
-                print(f"Task ID: {tarea.id}")
-                print(f"Task Name: {tarea.nombre}")
-                print(f"Company Name: {tarea.empresa}")
-                print(f"Customer Company: {tarea.cliente}")
-                print(f"Description: {tarea.descripcion}")
-                print(f"Start Date: {tarea.fecha_inicio.strftime('%Y-%m-%d')}")
-                print(f"Due Date: {tarea.fecha_vencimiento.strftime('%Y-%m-%d')}")
-                print(f"Current Status: {tarea.estado_actual}")
-                print(f"Percentage Complete: {tarea.porcentaje}%")
+                print(f"Tarea ID: {tarea.id}")
+                print(f"Tarea Name: {tarea.nombre}")
+                print(f"Empresa Name: {tarea.empresa}")
+                print(f"Cliente: {tarea.cliente}")
+                print(f"Descripcion: {tarea.descripcion}")
+                print(f"Fecha de inicio: {tarea.fecha_inicio.strftime('%Y-%m-%d')}")
+                print(f"Fecha de vencimiento: {tarea.fecha_vencimiento.strftime('%Y-%m-%d')}")
+                print(f"Estado actual: {tarea.estado_actual}")
+                print(f"Porcentaje completado: {tarea.porcentaje}%")
             else:
                 print("Task not found.")
                 
-        elif opcion == '15':
+        elif opcion == '14':
             if proyecto_principal.tareas:  # Asegurarse de que hay tareas para mostrar
                 for tarea in proyecto_principal.tareas:
-                    print(f"Task ID: {tarea.id}")
-                    print(f"Task Name: {tarea.nombre}")
-                    print(f"Company Name: {tarea.empresa}")
-                    print(f"Customer Company: {tarea.cliente}")
-                    print(f"Description: {tarea.descripcion}")
-                    print(f"Start Date: {tarea.fecha_inicio.strftime('%Y-%m-%d')}")
-                    print(f"Due Date: {tarea.fecha_vencimiento.strftime('%Y-%m-%d')}")
-                    print(f"Current Status: {tarea.estado_actual}")
-                    print(f"Percentage Complete: {tarea.porcentaje}%")
+                    print(f"Tarea ID: {tarea.id}")
+                    print(f"Tarea Name: {tarea.nombre}")
+                    print(f"Empresa Name: {tarea.empresa}")
+                    print(f"Cliente: {tarea.cliente}")
+                    print(f"Descripcion: {tarea.descripcion}")
+                    print(f"Fecha de inicio: {tarea.fecha_inicio.strftime('%Y-%m-%d')}")
+                    print(f"Fecha de vencimiento: {tarea.fecha_vencimiento.strftime('%Y-%m-%d')}")
+                    print(f"Estado actual: {tarea.estado_actual}")
+                    print(f"Porcentaje completado: {tarea.porcentaje}%")
                     print("-" * 40)  # Separador entre tareas
             else:
                 print("No tasks found.")
                 
-        elif opcion == '16':
+        elif opcion == '15':
             id_tarea = input("Ingrese el ID de la tarea a eliminar: ")
             tarea_eliminada = proyecto_principal.delete_task(id_tarea)
             if tarea_eliminada:
                 print("Tarea eliminada con éxito.")
             else:
                 print("Tarea no encontrada.")
-                
-              
-                
+                   
                 
 
 if __name__ == "__main__":
