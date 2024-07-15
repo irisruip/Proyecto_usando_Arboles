@@ -21,45 +21,7 @@ class Empresa:
         self.gerente = gerente
         self.equipo_contacto = equipo_contacto
         self.proyectos = []
-
-class Proyectos:
-    def __init__(self, id, nombre, descripcion, fecha_inicio, fecha_vencimiento, estado_actual, empresa, gerente, equipo):
-        self.id = id
-        self.nombre = nombre
-        self.descripcion = descripcion
-        self.fecha_inicio = fecha_inicio
-        self.fecha_vencimiento = fecha_vencimiento
-        self.estado_actual = estado_actual
-        self.empresa = empresa
-        self.gerente = gerente
-        self.equipo = equipo
-        self.tareas = []
         
-class Tareas:
-    def __init__(self, id, nombre, empresa,  cliente, descripcion, fecha_inicio, fecha_vencimiento, estado_actual, porcentaje):
-        self.id = id
-        self.nombre = nombre
-        self.empresa = empresa
-        self.cliente = cliente
-        self.descripcion = descripcion
-        self.fecha_inicio = fecha_inicio
-        self.fecha_vencimiento = fecha_vencimiento
-        self.estado_actual = estado_actual
-        self.porcentaje = porcentaje
-        self.subtareas = []
-        
-class subTareas:
-    def __init__(self, id, nombre, empresa,  cliente, descripcion, fecha_inicio, fecha_vencimiento, estado_actual, porcentaje):
-        self.id = id
-        self.nombre = nombre
-        self.empresa = empresa
-        self.cliente = cliente
-        self.descripcion = descripcion
-        self.fecha_inicio = fecha_inicio
-        self.fecha_vencimiento = fecha_vencimiento
-        self.estado_actual = estado_actual
-        self.porcentaje = porcentaje
-
 #nodo para lista enlazada
 class NodoEmpresa:
     def __init__(self, empresa):
@@ -124,7 +86,7 @@ class Gestion:
                 nodo_actual = nodo_actual.siguiente
             nodo_actual.siguiente = nuevo_nodo
             
-        with open('algo.csv', 'a', newline='') as archivo:
+        with open('companie.csv', 'a', newline='') as archivo:
             escritor = csv.DictWriter(archivo, fieldnames=['id', 'nombre', 'descripcion', 'fecha_creacion', 'direccion', 'telefono', 'correo', 'gerente', 'equipo_contacto'])
             escritor.writerow({
                 'id': empresa.id,
@@ -163,11 +125,11 @@ class Gestion:
         empresa_a_modificar.equipo_contacto = nuevos_miembros_equipo
         
         # Actualizar el registro correspondiente en el archivo "algo.csv"
-        with open('algo.csv', 'r') as archivo_lectura:
+        with open('companie.csv', 'r') as archivo_lectura:
             lector = csv.DictReader(archivo_lectura)
             lineas = list(lector)
             
-        with open('algo.csv', 'w', newline='') as archivo_escritura:
+        with open('companie.csv', 'w', newline='') as archivo_escritura:
             escritor = csv.DictWriter(archivo_escritura, fieldnames=['id', 'nombre', 'descripcion', 'fecha_creacion', 'direccion', 'telefono', 'correo', 'gerente', 'equipo_contacto'])
             escritor.writeheader()
             
@@ -227,11 +189,11 @@ class Gestion:
                 else:
                     nodo_anterior.siguiente = nodo_actual.siguiente
                 
-                with open('algo.csv', 'r') as archivo_lectura:
+                with open('companie.csv', 'r') as archivo_lectura:
                     lector = csv.DictReader(archivo_lectura)
                     lineas = list(lector)
                     
-                with open('algo.csv', 'w', newline='') as archivo_escritura:
+                with open('companie.csv', 'w', newline='') as archivo_escritura:
                     escritor = csv.DictWriter(archivo_escritura, fieldnames=['id', 'nombre', 'descripcion', 'fecha_creacion', 'direccion', 'telefono', 'correo', 'gerente', 'equipo_contacto'])
                     escritor.writeheader()
                     
@@ -244,10 +206,141 @@ class Gestion:
             
             nodo_anterior = nodo_actual
             nodo_actual = nodo_actual.siguiente
+
+class Proyectos:
+    def __init__(self, id, nombre, descripcion, fecha_inicio, fecha_vencimiento, estado_actual, empresa, gerente, equipo):
+        self.id = id
+        self.nombre = nombre
+        self.descripcion = descripcion
+        self.fecha_inicio = fecha_inicio
+        self.fecha_vencimiento = fecha_vencimiento
+        self.estado_actual = estado_actual
+        self.empresa = empresa
+        self.gerente = gerente
+        self.equipo = equipo
+        self.tareas = []
         
+class AVLNode:
+    def __init__(self, proyecto):
+        self.proyecto = proyecto
+        self.altura = 1
+        self.izquierda = None
+        self.derecha = None
+
+class AVLTree:
+    def insert(self, root, proyecto):
+        if not root:
+            return AVLNode(proyecto)
+        elif proyecto.fecha_vencimiento < root.proyecto.fecha_vencimiento:
+            root.izquierda = self.insert(root.izquierda, proyecto)
+        else:
+            root.derecha = self.insert(root.derecha, proyecto)
+
+        root.altura = 1 + max(self.getHeight(root.izquierda), self.getHeight(root.derecha))
+        balance = self.getBalance(root)
+
+        if balance > 1 and proyecto.fecha_vencimiento < root.izquierda.proyecto.fecha_vencimiento:
+            return self.rightRotate(root)
+        if balance < -1 and proyecto.fecha_vencimiento >= root.derecha.proyecto.fecha_vencimiento:
+            return self.leftRotate(root)
+        if balance > 1 and proyecto.fecha_vencimiento >= root.izquierda.proyecto.fecha_vencimiento:
+            root.izquierda = self.leftRotate(root.izquierda)
+            return self.rightRotate(root)
+        if balance < -1 and proyecto.fecha_vencimiento < root.derecha.proyecto.fecha_vencimiento:
+            root.derecha = self.rightRotate(root.derecha)
+            return self.leftRotate(root)
+
+        return root
+
+    def leftRotate(self, z):
+        y = z.derecha
+        T2 = y.izquierda
+        y.izquierda = z
+        z.dercha = T2
+        z.altura = 1 + max(self.getHeight(z.izquierda), self.getHeight(z.derecha))
+        y.altura = 1 + max(self.getHeight(y.izquierda), self.getHeight(y.derecha))
+        return y
+    
+    def rightRotate(self, y):
+        x = y.izquierda
+        T2 = x.derecha
+        x.derecha = y
+        y.izquierda = T2
+        y.altura = 1 + max(self.getHeight(y.izquierda), self.getHeight(y.derecha))
+        x.altura = 1 + max(self.getHeight(x.izquierda), self.getHeight(x.derecha))
+        return x
+
+    def getHeight(self, root):
+        if not root:
+            return 0
+        return root.altura
+
+    def getBalance(self, root):
+        if not root:
+            return 0
+        return self.getHeight(root.izquierda) - self.getHeight(root.derecha)
+
+    def preOrder(self, root):
+        if not root:
+            return
+        print("{0} ".format(root.proyecto.nombre), end="")
+        self.preOrder(root.izquierda)
+        self.preOrder(root.derecha)
+        
+    def search(self, root, key):
+        if root is None or root.proyecto.id == key:
+            return root
+        if root.proyecto.id < key:
+            return self.search(root.derecha, key)
+        return self.search(root.izquierda, key)
+
+    def collectProjects(self, root, projects_list):
+        if root:
+            self.collectProjects(root.izquierda, projects_list)
+            projects_list.append(root.proyecto)
+            self.collectProjects(root.derecha, projects_list)
+            
+    def preOrderCloseToDueDate(self, root):
+        projects_list = []
+        self.collectProjects(root, projects_list)
+        # Sort projects by their due date, closest first
+        projects_list.sort(key=lambda project: project.fecha_vencimiento)
+        
+        for project in projects_list:
+            print(f"{project.nombre} - Vencimiento: {project.fecha_vencimiento.strftime('%Y-%m-%d')}")
+            
+class Tareas:
+    def __init__(self, id, nombre, empresa,  cliente, descripcion, fecha_inicio, fecha_vencimiento, estado_actual, porcentaje):
+        self.id = id
+        self.nombre = nombre
+        self.empresa = empresa
+        self.cliente = cliente
+        self.descripcion = descripcion
+        self.fecha_inicio = fecha_inicio
+        self.fecha_vencimiento = fecha_vencimiento
+        self.estado_actual = estado_actual
+        self.porcentaje = porcentaje
+        self.subtareas = []
+        
+class subTareas:
+    def __init__(self, id, nombre, empresa,  cliente, descripcion, fecha_inicio, fecha_vencimiento, estado_actual, porcentaje):
+        self.id = id
+        self.nombre = nombre
+        self.empresa = empresa
+        self.cliente = cliente
+        self.descripcion = descripcion
+        self.fecha_inicio = fecha_inicio
+        self.fecha_vencimiento = fecha_vencimiento
+        self.estado_actual = estado_actual
+        self.porcentaje = porcentaje
+
+
+
 
            
 def menu():
+    
+    print("\n")
     print("-----MODULO DE GESTION DE EMPRESAS----")
     print("1. Crear empresa")
     print("2. Modificar empresa")
@@ -255,6 +348,7 @@ def menu():
     print("4. Listar empresas")
     print("5. Eliminar empresa")
     print("6. Salir del modulo de gestion de empresas")
+    print("\n")
     
     print("-----MODULO DE GESTION DE PROYECTOS----")
     print("7. Crear proyecto")
@@ -263,6 +357,7 @@ def menu():
     print("10. Listar proyecto")
     print("11. Eliminar proyecto")
     print("12. Salir del modulo de gestion de proyectos")
+    print("\n")
     
     print("-----MODULO DE GESTION DE TAREAS Y PRIORIDADES----")
     print("13. Crear tarea")
@@ -287,12 +382,27 @@ def main():
         )
     
     gestion_empresas = Gestion()
-    gestion_empresas.cargar_datos("algo.csv")
-    gestion_empresas.guardar_datos("algo.csv")
+    gestion_empresas.cargar_datos("companie.csv")
+    gestion_empresas.guardar_datos("companie.csv")
+    
+    proyecto_principal = Proyectos(
+        0,
+        "nombre",
+        "descripcion",
+        datetime.now(),
+        datetime.now(),
+        "estado_actual",
+        "empresa",
+        "gerente",
+        "equipo",
+    )
+    projects_avl_tree = AVLTree()
+    root = None
     
     #manejo el menu de opciones
     while True:
         menu()
+        print("\n")
         opcion = input("Seleccione una opcion: ")
         
         if opcion=='1':
@@ -320,12 +430,13 @@ def main():
             id_empresa = int(input("Ingrese id de empresa a modificar: "))
             nuevo_nombre = input("Ingrese el nuevo nombre de la empresa : ") 
             nueva_descripcion = input("Ingrese la nueva descripción de la empresa : ") 
-            try:
-                nueva_fecha_creacion = input("Ingrese la nueva fecha de creación (YYYY-MM-DD): ")
-                nueva_fecha_creacion = datetime.strptime(nueva_fecha_creacion, "%Y-%m-%d")
-                break  
-            except ValueError:
-                print("Formato de fecha no válido. Intente de nuevo.")
+            while True:
+                try:
+                    nueva_fecha_creacion = input("Ingrese la nueva fecha de creación (YYYY-MM-DD): ")
+                    nueva_fecha_creacion = datetime.strptime(nueva_fecha_creacion, "%Y-%m-%d")
+                    break  
+                except ValueError:
+                    print("Formato de fecha no válido. Intente de nuevo.")
             nueva_direccion = input("Ingrese la nueva dirección de la empresa: ")
             nuevo_telefono = input("Ingrese el nuevo teléfono de la empresa: ")
             nuevo_correo = input("Ingrese el nuevo correo electrónico de la empresa: ")
@@ -355,9 +466,52 @@ def main():
         elif opcion =='5':
             id_empresa = int(input("Ingrese el ID de la empresa que desea eliminar: "))
             gestion_empresas.eliminar_empresa(id_empresa)
+
+        
+        elif opcion == '7':
+            # Add project
+            id = input("Ingrese el ID del proyecto: ")
+            nombre = input("Ingrese el nombre del proyecto: ")
+            descripcion = input("Ingrese la descripcion: ")
+            while True:
+                try:
+                    fecha_inicio = input("Ingrese la fecha de inicio (YYYY-MM-DD): ")
+                    fecha_inicio = datetime.strptime(fecha_inicio, "%Y-%m-%d")
+                    break  
+                except ValueError:
+                    print("Formato de fecha no válido. Intente de nuevo.")
+            while True:
+                try:
+                    fecha_vencimiento = input("Ingrese la fecha de vencimiento (YYYY-MM-DD): ")
+                    fecha_vencimiento = datetime.strptime(fecha_vencimiento, "%Y-%m-%d")
+                    break  
+                except ValueError:
+                    print("Formato de fecha no válido. Intente de nuevo.")
+            estado_actual = input("Ingrese el estado actual: ")
+            empresa = input("Ingrese nombre de la empresa: ")
+            gerente = input("Ingrese el gerente: ")
+            equipo = input("Ingrese el equipo: ")
+            proyecto = Proyectos(id, nombre, descripcion, fecha_inicio, fecha_vencimiento, estado_actual, empresa, gerente, equipo)
+            root = projects_avl_tree.insert(root, proyecto)
+            print("Proyecto agregado satisfactoriamente.")
+        
+        
+        elif opcion == '8':
+            project_id = input("Ingrese el ID del proyecto: ")
+            project_node = projects_avl_tree.search(root, project_id)  # Assuming a search method exists
+            if project_node:
+                new_name = input("Enter new project name (leave blank to keep current): ")
+                if new_name:
+                    proyecto.nombre = new_name            
+                print("Proyecto actualizado satisactoriamente.")
+            else:
+                print("Proyecto no encontrado.")
+                
+        elif opcion == '10':
+            print("Proyectos en el árbol AVL (preorder): ")
+            projects_avl_tree.preOrderCloseToDueDate(root)
             
-        if opcion =='6':
-            break
+        
 
 if __name__ == "__main__":
     main()
