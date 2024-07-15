@@ -1,6 +1,7 @@
 import csv
 from datetime import datetime
 import os
+import json
 
 # Verificar el directorio de trabajo actual
 print("Directorio de trabajo actual:", os.getcwd())
@@ -293,7 +294,8 @@ class AVLTree:
         if root.proyecto.id < key:
             return self.search(root.derecha, key)
         return self.search(root.izquierda, key)
-
+    
+    
     def collectProjects(self, root, projects_list):
         if root:
             self.collectProjects(root.izquierda, projects_list)
@@ -308,7 +310,64 @@ class AVLTree:
         
         for project in projects_list:
             print(f"{project.nombre} - Vencimiento: {project.fecha_vencimiento.strftime('%Y-%m-%d')}")
-            
+    
+    def delete(self, root, project_id):
+        if not root:
+            return root
+
+        # Step 1: Perform standard BST delete
+        if project_id < root.proyecto.id:
+            root.izquierda = self.delete(root.izquierda, project_id)
+        elif project_id > root.proyecto.id:
+            root.derecha = self.delete(root.derecha, project_id)
+        else:
+            if root.izquierda is None:
+                temp = root.derecha
+                root = None
+                return temp
+            elif root.derecha is None:
+                temp = root.izquierda
+                root = None
+                return temp
+            temp = self.getMinValueNode(root.derecha)
+            root.proyecto = temp.proyecto
+            root.derecha = self.delete(root.derecha, temp.proyecto.id)
+
+        # If the tree had only one node then return
+        if root is None:
+            return root
+        
+         # Step 2: Update the height of the current node
+        root.altura = 1 + max(self.getHeight(root.izquierda), self.getHeight(root.derecha))
+
+        # Step 3: Get the balance factor
+        balance = self.getBalance(root)
+
+        # Step 4: If the node is unbalanced, then try out the 4 cases
+        # Case 1 - Left Left
+        if balance > 1 and self.getBalance(root.izquierda) >= 0:
+            return self.rightRotate(root)
+
+        # Case 2 - Right Right
+        if balance < -1 and self.getBalance(root.derecha) <= 0:
+            return self.leftRotate(root)
+
+        # Case 3 - Left Right
+        if balance > 1 and self.getBalance(root.izquierda) < 0:
+            root.izquierda = self.leftRotate(root.izquierda)
+            return self.rightRotate(root)
+
+        # Case 4 - Right Left
+        if balance < -1 and self.getBalance(root.derecha) > 0:
+            root.derecha = self.rightRotate(root.derecha)
+            return self.leftRotate(root)
+
+        return root
+
+    def getMinValueNode(self, node):
+        if node is None or node.izquierda is None:
+            return node
+        return self.getMinValueNode(node.izquierda)       
 class Tareas:
     def __init__(self, id, nombre, empresa,  cliente, descripcion, fecha_inicio, fecha_vencimiento, estado_actual, porcentaje):
         self.id = id
@@ -506,11 +565,34 @@ def main():
                 print("Proyecto actualizado satisactoriamente.")
             else:
                 print("Proyecto no encontrado.")
+        
+        elif opcion == '9':
+            project_id = input("Ingrese el ID del proyecto: ")
+            project_node = projects_avl_tree.search(root, project_id)
+            if project_node:
+                proyecto = project_node.proyecto
+                print(f"ID: {proyecto.id}")
+                print(f"Nombre: {proyecto.nombre}")
+                print(f"Descripción: {proyecto.descripcion}")
+                print(f"Fecha de inicio: {proyecto.fecha_inicio.strftime('%Y-%m-%d')}")
+                print(f"Fecha de vencimiento: {proyecto.fecha_vencimiento.strftime('%Y-%m-%d')}")
+                print(f"Estado actual: {proyecto.estado_actual}")
+                print(f"Empresa: {proyecto.empresa}")
+                print(f"Gerente: {proyecto.gerente}")
+                print(f"Equipo: {proyecto.equipo}")
+            
+            else:
+                print("Proyecto no encontrado")
+            
                 
         elif opcion == '10':
             print("Proyectos en el árbol AVL (preorder): ")
             projects_avl_tree.preOrderCloseToDueDate(root)
-            
+        
+        elif opcion == '11':
+            project_id_to_delete = input("Ingrese el ID del proyecto a eliminar: ")
+            root = projects_avl_tree.delete(root, project_id_to_delete)
+            print("Proyecto eliminado satisfactoriamente")    
         
 
 if __name__ == "__main__":
