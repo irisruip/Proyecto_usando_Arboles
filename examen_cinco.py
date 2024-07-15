@@ -221,6 +221,79 @@ class Proyectos:
         self.equipo = equipo
         self.tareas = []
         
+    def add_task(self, tarea, parent_id=None):
+        if parent_id is None:
+            self.tareas.append(tarea)
+        else:
+            parent_task = self.find_task(parent_id)
+            if parent_task:
+                parent_task.subtasks.append(tarea)
+
+    def find_task(self, id, tareas=None):
+        if tareas is None:
+            tareas = self.tareas
+        for tarea in tareas:
+            if tarea.id == id:
+                return tarea
+            subtask = self.find_task(id, tarea.subtareas)
+            if subtask:
+                return subtask
+        return None
+    
+    def delete_task(self, id):
+        def _delete_task(tareas):
+            return [tarea for tarea in tareas if tarea.id != id and _delete_task(tarea.subtareas)]
+
+        self.tareas = _delete_task(self.tareas)
+
+    def list_tasks(self, level=0, tareas=None, prefix=""):
+        if tareas is None:
+            tareas = self.tareas
+        for tarea in tareas:
+            print(f"{prefix}Task ID: {tarea.id}, Name: {tarea.name}, Level: {level}")
+            self.list_tasks(level + 1, tarea.subtasks, prefix + "--")
+
+    def save_to_json(self, filename):
+        with open(filename, 'w') as file:
+            json.dump([self._task_to_dict(tarea) for tarea in self.tareas], file, indent=4, default=str)
+
+    
+    def load_from_json(self, filename):
+        try:
+            with open(filename, 'r') as file:
+                # Check if the file is not empty
+                file_content = file.read()
+                if not file_content:
+                    raise ValueError("File is empty")
+                tasks_data = json.loads(file_content)  # Use json.loads to load from a string
+                self.tareas = [self._dict_to_task(task_data) for task_data in tasks_data]
+                
+        except FileNotFoundError:
+            self.tareas = []
+        except ValueError as e:
+            print(f"Error loading JSON: {e}")
+            self.tareas = []
+    
+    def _task_to_dict(self, tarea):
+        return {
+            "id": tarea.id,
+            "name": tarea.name,
+            "customer_company": tarea.customer_company,
+            "description": tarea.description,
+            "start_date": tarea.start_date.isoformat(),
+            "due_date": tarea.due_date.isoformat(),
+            "current_status": tarea.current_status,
+            "percentage": tarea.percentage,
+            "subtasks": [self._task_to_dict(subtask) for subtask in tarea.subtareas]
+        }
+
+    def _dict_to_task(self, data):
+        tarea = Tareas(data['id'], data['name'], data['customer_company'], data['description'],
+                    datetime.fromisoformat(data['start_date']), datetime.fromisoformat(data['due_date']),
+                    data['current_status'], data['percentage'])
+        tarea.subtareas = [self._dict_to_task(subtask_data) for subtask_data in data.get('subtareas', [])]
+        return tarea      
+               
 class AVLNode:
     def __init__(self, proyecto):
         self.proyecto = proyecto
@@ -367,7 +440,9 @@ class AVLTree:
     def getMinValueNode(self, node):
         if node is None or node.izquierda is None:
             return node
-        return self.getMinValueNode(node.izquierda)       
+        return self.getMinValueNode(node.izquierda) 
+
+
 class Tareas:
     def __init__(self, id, nombre, empresa,  cliente, descripcion, fecha_inicio, fecha_vencimiento, estado_actual, porcentaje):
         self.id = id
@@ -381,6 +456,7 @@ class Tareas:
         self.porcentaje = porcentaje
         self.subtareas = []
         
+        
 class subTareas:
     def __init__(self, id, nombre, empresa,  cliente, descripcion, fecha_inicio, fecha_vencimiento, estado_actual, porcentaje):
         self.id = id
@@ -392,8 +468,6 @@ class subTareas:
         self.fecha_vencimiento = fecha_vencimiento
         self.estado_actual = estado_actual
         self.porcentaje = porcentaje
-
-
 
 
            
@@ -458,6 +532,7 @@ def main():
     projects_avl_tree = AVLTree()
     root = None
     
+    proyecto_principal.load_from_json('tareas.json')
     #manejo el menu de opciones
     while True:
         menu()
@@ -592,7 +667,25 @@ def main():
         elif opcion == '11':
             project_id_to_delete = input("Ingrese el ID del proyecto a eliminar: ")
             root = projects_avl_tree.delete(root, project_id_to_delete)
-            print("Proyecto eliminado satisfactoriamente")    
+            print("Proyecto eliminado satisfactoriamente")
+            
+        elif opcion == '13':
+            id = input("Task ID: ")
+            name = input("Task Name: ")
+            customer_company = input("Customer Company: ")
+            description = input("Description: ")
+            start_date = input("Start Date (YYYY-MM-DD): ")
+            due_date = input("Due Date (YYYY-MM-DD): ")
+            current_status = input("Current Status: ")
+            percentage = float(input("Percentage Complete: "))
+            parent_id = input("Parent Task ID (leave blank if none): ")
+            parent_id = None if parent_id == '' else parent_id
+
+            tarea = Tareas(id, name, customer_company, description, datetime.strptime(start_date, "%Y-%m-%d"), datetime.strptime(due_date, "%Y-%m-%d"), current_status, porcentaje = percentage)
+            proyecto_principal.add_task(tarea, parent_id)
+            print("Task added successfully.")
+            
+             
         
 
 if __name__ == "__main__":
