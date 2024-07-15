@@ -954,7 +954,7 @@ def main():
                 print("Task not found.")
                 
         elif opcion == '14':
-            if proyecto_principal.tareas:  # Asegurarse de que hay tareas para mostrar
+            if proyecto_principal.tareas:  # Asegurarse de que hay tareas para mostraar
                 for tarea in proyecto_principal.tareas:
                     print(f"Tarea ID: {tarea.id}")
                     print(f"Tarea Name: {tarea.nombre}")
